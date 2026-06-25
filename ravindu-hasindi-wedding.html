@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ravindu & Hasindi — September 11, 2027</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --white: #ffffff;
+    --lavender-50: #f5f3ff;
+    --lavender-100: #ede9fe;
+    --lavender-200: #ddd6fe;
+    --lavender-400: #a78bfa;
+    --lavender-600: #7c3aed;
+    --lavender-soft: #e8e4f5;
+    --gold: #c9a96e;
+    --text-dark: #2a2035;
+    --text-mid: #6b6080;
+    --text-light: #a09ab8;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Jost', sans-serif;
+    background: var(--white);
+    color: var(--text-dark);
+    overflow-x: hidden;
+  }
+
+  /* ── MUSIC PLAYER ── */
+  #music-btn {
+    position: fixed; top: 20px; right: 20px; z-index: 999;
+    width: 44px; height: 44px; border-radius: 50%;
+    background: rgba(255,255,255,0.9);
+    border: 1px solid var(--lavender-200);
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    font-size: 18px; backdrop-filter: blur(8px);
+    box-shadow: 0 2px 12px rgba(124,58,237,0.15);
+    transition: transform 0.2s;
+  }
+  #music-btn:hover { transform: scale(1.08); }
+  #music-btn.playing { background: var(--lavender-100); }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    padding: 0 2rem;
+    background: rgba(255,255,255,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--lavender-100);
+    display: flex; align-items: center; justify-content: space-between;
+    height: 60px;
+  }
+  .nav-brand {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.2rem; letter-spacing: 0.05em;
+    color: var(--text-dark);
+  }
+  .nav-links { display: flex; gap: 2rem; list-style: none; }
+  .nav-links a {
+    font-size: 0.78rem; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--text-mid); text-decoration: none;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--lavender-600); }
+
+  /* ── HERO ── */
+  #hero {
+    min-height: 100vh;
+    background:
+      radial-gradient(ellipse 80% 60% at 20% 10%, var(--lavender-100) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 50% at 80% 90%, var(--lavender-50) 0%, transparent 60%),
+      var(--white);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    text-align: center; padding: 5rem 2rem 4rem;
+    position: relative;
+  }
+
+  .hero-eyebrow {
+    font-size: 0.7rem; letter-spacing: 0.3em; text-transform: uppercase;
+    color: var(--text-light); margin-bottom: 1.5rem;
+  }
+
+  .hero-names {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(3.5rem, 10vw, 7rem);
+    font-weight: 300; line-height: 1;
+    color: var(--text-dark);
+  }
+  .hero-names em { font-style: italic; color: var(--lavender-600); }
+
+  .hero-ampersand {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(2rem, 6vw, 4rem);
+    font-style: italic; font-weight: 300;
+    color: var(--gold); display: block; margin: 0.3rem 0;
+  }
+
+  .hero-date {
+    margin-top: 2rem;
+    font-size: 0.8rem; letter-spacing: 0.25em; text-transform: uppercase;
+    color: var(--text-mid);
+  }
+
+  .hero-divider {
+    display: flex; align-items: center; gap: 1rem;
+    margin: 1.5rem auto; width: fit-content;
+  }
+  .hero-divider-line { width: 60px; height: 1px; background: var(--lavender-200); }
+  .hero-divider-diamond { width: 6px; height: 6px; background: var(--gold); transform: rotate(45deg); }
+
+  .hero-venue {
+    font-size: 0.85rem; color: var(--text-mid); letter-spacing: 0.08em;
+  }
+  .hero-venue a {
+    color: var(--lavender-600); text-decoration: none;
+    border-bottom: 1px solid var(--lavender-200);
+    transition: border-color 0.2s;
+  }
+  .hero-venue a:hover { border-color: var(--lavender-600); }
+
+  /* Floating petals */
+  .petal {
+    position: absolute; pointer-events: none; opacity: 0.5;
+    font-size: 1.2rem; animation: float linear infinite;
+  }
+  @keyframes float {
+    0%   { transform: translateY(-20px) rotate(0deg); opacity: 0; }
+    10%  { opacity: 0.5; }
+    90%  { opacity: 0.3; }
+    100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
+  }
+
+  /* ── COUNTDOWN ── */
+  #countdown {
+    padding: 5rem 2rem;
+    background: var(--lavender-50);
+    text-align: center;
+  }
+  .section-label {
+    font-size: 0.7rem; letter-spacing: 0.3em; text-transform: uppercase;
+    color: var(--lavender-400); margin-bottom: 0.75rem;
+  }
+  .section-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(1.8rem, 4vw, 2.8rem);
+    font-weight: 300; color: var(--text-dark);
+    margin-bottom: 3rem;
+  }
+  .countdown-grid {
+    display: flex; gap: 1.5rem; justify-content: center; flex-wrap: wrap;
+  }
+  .countdown-card {
+    background: var(--white);
+    border: 1px solid var(--lavender-100);
+    border-radius: 12px; padding: 1.5rem 2rem;
+    min-width: 100px;
+  }
+  .countdown-num {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 3.5rem; font-weight: 300; line-height: 1;
+    color: var(--text-dark);
+  }
+  .countdown-label {
+    font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--text-light); margin-top: 0.4rem;
+  }
+
+  /* ── SCHEDULE ── */
+  #schedule {
+    padding: 5rem 2rem;
+    max-width: 700px; margin: 0 auto;
+    text-align: center;
+  }
+  .timeline {
+    margin-top: 3rem; text-align: left;
+    position: relative;
+  }
+  .timeline::before {
+    content: '';
+    position: absolute; left: 24px; top: 0; bottom: 0;
+    width: 1px; background: var(--lavender-200);
+  }
+  .timeline-item {
+    display: flex; gap: 1.5rem; margin-bottom: 2rem;
+    align-items: flex-start;
+  }
+  .timeline-dot {
+    width: 48px; height: 48px; border-radius: 50%;
+    background: var(--white); border: 1px solid var(--lavender-200);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.3rem; flex-shrink: 0; position: relative; z-index: 1;
+  }
+  .timeline-content { padding-top: 0.6rem; }
+  .timeline-time {
+    font-size: 0.7rem; letter-spacing: 0.15em; text-transform: uppercase;
+    color: var(--lavender-400); margin-bottom: 0.3rem;
+  }
+  .timeline-event {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.3rem; font-weight: 400; color: var(--text-dark);
+  }
+  .timeline-desc {
+    font-size: 0.85rem; color: var(--text-mid); margin-top: 0.2rem;
+  }
+
+  /* ── GALLERY ── */
+  #gallery {
+    padding: 5rem 2rem;
+    background: var(--lavender-50);
+    text-align: center;
+  }
+  .gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1rem; max-width: 900px; margin: 3rem auto 0;
+  }
+  .gallery-item {
+    background: var(--lavender-100);
+    border-radius: 12px; overflow: hidden;
+    aspect-ratio: 4/5;
+    display: flex; align-items: center; justify-content: center;
+    position: relative;
+    border: 1px solid var(--lavender-200);
+    transition: transform 0.3s;
+  }
+  .gallery-item:hover { transform: translateY(-4px); }
+  .gallery-item:first-child { grid-row: span 2; aspect-ratio: auto; }
+  .gallery-placeholder {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1rem; color: var(--lavender-400);
+    text-align: center; padding: 2rem;
+    font-style: italic;
+  }
+  .gallery-note {
+    margin-top: 1.5rem;
+    font-size: 0.8rem; color: var(--text-light); font-style: italic;
+  }
+
+  /* ── RSVP ── */
+  #rsvp {
+    padding: 5rem 2rem;
+    max-width: 560px; margin: 0 auto;
+    text-align: center;
+  }
+  .rsvp-form {
+    margin-top: 2.5rem; text-align: left;
+    display: flex; flex-direction: column; gap: 1.2rem;
+  }
+  .form-group { display: flex; flex-direction: column; gap: 0.4rem; }
+  .form-label {
+    font-size: 0.7rem; letter-spacing: 0.15em; text-transform: uppercase;
+    color: var(--text-mid);
+  }
+  .form-input, .form-select, .form-textarea {
+    font-family: 'Jost', sans-serif; font-size: 0.95rem;
+    padding: 0.75rem 1rem; border-radius: 8px;
+    border: 1px solid var(--lavender-200);
+    background: var(--white); color: var(--text-dark);
+    outline: none; transition: border-color 0.2s;
+    width: 100%;
+  }
+  .form-input:focus, .form-select:focus, .form-textarea:focus {
+    border-color: var(--lavender-400);
+  }
+  .form-textarea { resize: vertical; min-height: 90px; }
+  .rsvp-btn {
+    margin-top: 0.5rem; padding: 0.9rem 2rem;
+    background: var(--text-dark); color: var(--white);
+    border: none; border-radius: 8px; font-family: 'Jost', sans-serif;
+    font-size: 0.8rem; letter-spacing: 0.2em; text-transform: uppercase;
+    cursor: pointer; transition: background 0.2s, transform 0.15s;
+    width: 100%;
+  }
+  .rsvp-btn:hover { background: var(--lavender-600); }
+  .rsvp-btn:active { transform: scale(0.98); }
+  .rsvp-success {
+    display: none; margin-top: 1.5rem; padding: 1.2rem;
+    background: var(--lavender-100); border-radius: 8px;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.2rem; color: var(--lavender-600);
+    font-style: italic; text-align: center;
+  }
+
+  /* ── MAP ── */
+  #venue {
+    padding: 5rem 2rem;
+    background: var(--lavender-50);
+    text-align: center;
+  }
+  .map-frame {
+    margin: 2.5rem auto 0; max-width: 700px;
+    border-radius: 16px; overflow: hidden;
+    border: 1px solid var(--lavender-200);
+    box-shadow: 0 4px 30px rgba(124,58,237,0.08);
+  }
+  .map-frame iframe { display: block; width: 100%; height: 340px; border: 0; }
+  .venue-details {
+    margin-top: 2rem; display: flex; gap: 2rem;
+    justify-content: center; flex-wrap: wrap;
+  }
+  .venue-detail {
+    font-size: 0.85rem; color: var(--text-mid);
+  }
+  .venue-detail strong {
+    display: block; font-size: 0.7rem; letter-spacing: 0.15em; text-transform: uppercase;
+    color: var(--text-light); font-weight: 400; margin-bottom: 0.3rem;
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    padding: 4rem 2rem;
+    background: var(--text-dark);
+    text-align: center;
+    color: rgba(255,255,255,0.4);
+  }
+  .footer-names {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 2rem; font-weight: 300; font-style: italic;
+    color: rgba(255,255,255,0.85);
+    margin-bottom: 0.5rem;
+  }
+  .footer-date { font-size: 0.75rem; letter-spacing: 0.2em; text-transform: uppercase; }
+  .footer-note { margin-top: 2rem; font-size: 0.75rem; }
+
+  /* ── SECTION DECO ── */
+  .deco { color: var(--gold); font-size: 1.2rem; letter-spacing: 0.5em; opacity: 0.5; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 600px) {
+    .nav-links { display: none; }
+    .countdown-grid { gap: 0.8rem; }
+    .countdown-card { padding: 1rem 1.2rem; min-width: 70px; }
+    .countdown-num { font-size: 2.5rem; }
+    .gallery-item:first-child { grid-row: span 1; aspect-ratio: 4/5; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Music button -->
+<button id="music-btn" onclick="toggleMusic()" title="Toggle music" aria-label="Toggle background music">🎵</button>
+<audio id="bg-music" loop>
+  <source src="https://www.bensound.com/bensound-music/bensound-sweetness.mp3" type="audio/mpeg">
+</audio>
+
+<!-- Nav -->
+<nav>
+  <div class="nav-brand">R & H</div>
+  <ul class="nav-links">
+    <li><a href="#countdown">Countdown</a></li>
+    <li><a href="#schedule">Schedule</a></li>
+    <li><a href="#gallery">Gallery</a></li>
+    <li><a href="#venue">Venue</a></li>
+    <li><a href="#rsvp">RSVP</a></li>
+  </ul>
+</nav>
+
+<!-- Hero -->
+<section id="hero">
+  <!-- Floating petals -->
+  <span class="petal" style="left:8%;animation-duration:12s;animation-delay:0s;">🌸</span>
+  <span class="petal" style="left:25%;animation-duration:15s;animation-delay:3s;">✿</span>
+  <span class="petal" style="left:55%;animation-duration:10s;animation-delay:1s;">🌸</span>
+  <span class="petal" style="left:75%;animation-duration:13s;animation-delay:5s;">✿</span>
+  <span class="petal" style="left:90%;animation-duration:11s;animation-delay:2s;">🌸</span>
+
+  <p class="hero-eyebrow">Together with their families</p>
+  <div class="hero-names">
+    <em>Ravindu</em>
+    <span class="hero-ampersand">&</span>
+    <em>Hasindi</em>
+  </div>
+
+  <div class="hero-divider">
+    <div class="hero-divider-line"></div>
+    <div class="hero-divider-diamond"></div>
+    <div class="hero-divider-line"></div>
+  </div>
+
+  <p class="hero-date">Request the honour of your presence<br>on the eleventh of September, two thousand and twenty seven</p>
+
+  <div class="hero-divider" style="margin:1.2rem auto;">
+    <div class="hero-divider-line"></div>
+    <div class="hero-divider-diamond"></div>
+    <div class="hero-divider-line"></div>
+  </div>
+
+  <p class="hero-venue">
+    <a href="https://maps.app.goo.gl/QxM7uGaYvTL16zfc6" target="_blank">Sawingir Hills, Gonapola</a>
+  </p>
+</section>
+
+<!-- Countdown -->
+<section id="countdown">
+  <p class="section-label">Days until forever begins</p>
+  <h2 class="section-title">Counting Down to Our Day</h2>
+  <div class="countdown-grid">
+    <div class="countdown-card">
+      <div class="countdown-num" id="cd-days">---</div>
+      <div class="countdown-label">Days</div>
+    </div>
+    <div class="countdown-card">
+      <div class="countdown-num" id="cd-hours">--</div>
+      <div class="countdown-label">Hours</div>
+    </div>
+    <div class="countdown-card">
+      <div class="countdown-num" id="cd-mins">--</div>
+      <div class="countdown-label">Minutes</div>
+    </div>
+    <div class="countdown-card">
+      <div class="countdown-num" id="cd-secs">--</div>
+      <div class="countdown-label">Seconds</div>
+    </div>
+  </div>
+</section>
+
+<!-- Schedule -->
+<section id="schedule">
+  <p class="section-label">September 11, 2027</p>
+  <h2 class="section-title">The Day's Celebration</h2>
+  <p class="deco">✦ ✦ ✦</p>
+
+  <div class="timeline">
+    <div class="timeline-item">
+      <div class="timeline-dot">🌅</div>
+      <div class="timeline-content">
+        <div class="timeline-time">9:00 AM</div>
+        <div class="timeline-event">Guests Arrive</div>
+        <div class="timeline-desc">Welcome & seating at Sawingir Hills</div>
+      </div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-dot">💍</div>
+      <div class="timeline-content">
+        <div class="timeline-time">10:00 AM</div>
+        <div class="timeline-event">Wedding Ceremony</div>
+        <div class="timeline-desc">Exchange of vows and rings</div>
+      </div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-dot">📸</div>
+      <div class="timeline-content">
+        <div class="timeline-time">11:30 AM</div>
+        <div class="timeline-event">Photography Session</div>
+        <div class="timeline-desc">Couple & family portraits</div>
+      </div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-dot">🥂</div>
+      <div class="timeline-content">
+        <div class="timeline-time">1:00 PM</div>
+        <div class="timeline-event">Wedding Luncheon</div>
+        <div class="timeline-desc">Dining & celebration with loved ones</div>
+      </div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-dot">🎉</div>
+      <div class="timeline-content">
+        <div class="timeline-time">3:00 PM</div>
+        <div class="timeline-event">Reception & Dancing</div>
+        <div class="timeline-desc">Music, toasts & celebration continues</div>
+      </div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-dot">🌙</div>
+      <div class="timeline-content">
+        <div class="timeline-time">7:00 PM</div>
+        <div class="timeline-event">Farewell</div>
+        <div class="timeline-desc">Thank you for celebrating with us</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Gallery -->
+<section id="gallery">
+  <p class="section-label">Memories</p>
+  <h2 class="section-title">Our Story in Photos</h2>
+  <div class="gallery-grid">
+    <div class="gallery-item">
+      <div class="gallery-placeholder">
+        💜<br><br>Ravindu &<br>Hasindi<br><br><em style="font-size:0.8rem">Photo coming soon</em>
+      </div>
+    </div>
+    <div class="gallery-item">
+      <div class="gallery-placeholder">📷<br><em style="font-size:0.8rem">Add photo</em></div>
+    </div>
+    <div class="gallery-item">
+      <div class="gallery-placeholder">📷<br><em style="font-size:0.8rem">Add photo</em></div>
+    </div>
+    <div class="gallery-item">
+      <div class="gallery-placeholder">📷<br><em style="font-size:0.8rem">Add photo</em></div>
+    </div>
+    <div class="gallery-item">
+      <div class="gallery-placeholder">📷<br><em style="font-size:0.8rem">Add photo</em></div>
+    </div>
+  </div>
+  <p class="gallery-note">Photos will be updated as we get closer to the big day ✨</p>
+</section>
+
+<!-- Venue -->
+<section id="venue">
+  <p class="section-label">Location</p>
+  <h2 class="section-title">Sawingir Hills, Gonapola</h2>
+  <div class="map-frame">
+    <iframe
+      src="https://maps.google.com/maps?q=Sawingir+Hills+Gonapola&output=embed&z=15"
+      loading="lazy"
+      referrerpolicy="no-referrer-when-downgrade"
+      title="Venue location map">
+    </iframe>
+  </div>
+  <div class="venue-details">
+    <div class="venue-detail">
+      <strong>Date</strong>
+      September 11, 2027
+    </div>
+    <div class="venue-detail">
+      <strong>Time</strong>
+      9:00 AM onwards
+    </div>
+    <div class="venue-detail">
+      <strong>Venue</strong>
+      Sawingir Hills, Gonapola
+    </div>
+    <div class="venue-detail">
+      <strong>Directions</strong>
+      <a href="https://maps.app.goo.gl/QxM7uGaYvTL16zfc6" target="_blank" style="color:var(--lavender-600);text-decoration:none;">Open in Google Maps →</a>
+    </div>
+  </div>
+</section>
+
+<!-- RSVP -->
+<section id="rsvp">
+  <p class="section-label">Kindly reply by August 1, 2027</p>
+  <h2 class="section-title">Will You Join Us?</h2>
+  <p style="color:var(--text-mid);font-size:0.9rem;margin-top:-1rem;">We would be honoured to celebrate with you.</p>
+
+  <form class="rsvp-form" onsubmit="submitRSVP(event)">
+    <div class="form-group">
+      <label class="form-label" for="rsvp-name">Full Name</label>
+      <input class="form-input" id="rsvp-name" type="text" placeholder="Your full name" required>
+    </div>
+    <div class="form-group">
+      <label class="form-label" for="rsvp-email">Email Address</label>
+      <input class="form-input" id="rsvp-email" type="email" placeholder="your@email.com">
+    </div>
+    <div class="form-group">
+      <label class="form-label" for="rsvp-attending">Attendance</label>
+      <select class="form-select" id="rsvp-attending" required>
+        <option value="" disabled selected>Select an option</option>
+        <option value="yes">Joyfully accepts</option>
+        <option value="no">Regretfully declines</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label" for="rsvp-guests">Number of Guests (including yourself)</label>
+      <select class="form-select" id="rsvp-guests">
+        <option>1</option>
+        <option>2</option>
+        <option>3</option>
+        <option>4</option>
+        <option>5+</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label" for="rsvp-dietary">Dietary Requirements</label>
+      <input class="form-input" id="rsvp-dietary" type="text" placeholder="Vegetarian, vegan, allergies...">
+    </div>
+    <div class="form-group">
+      <label class="form-label" for="rsvp-message">Message to the Couple</label>
+      <textarea class="form-textarea" id="rsvp-message" placeholder="Share your wishes..."></textarea>
+    </div>
+    <button type="submit" class="rsvp-btn">Send RSVP</button>
+  </form>
+  <div class="rsvp-success" id="rsvp-success">
+    Thank you, your RSVP has been received! 💜<br>
+    <small style="font-family:'Jost',sans-serif;font-size:0.8rem;color:var(--text-mid);">We can't wait to celebrate with you.</small>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer>
+  <div class="footer-names">Ravindu & Hasindi</div>
+  <div class="footer-date">11 · September · 2027</div>
+  <div class="footer-note">Sawingir Hills, Gonapola &nbsp;·&nbsp; Created with love 💜</div>
+</footer>
+
+<script>
+// ── COUNTDOWN ──
+function updateCountdown() {
+  const wedding = new Date('2027-09-11T09:00:00');
+  const now = new Date();
+  const diff = wedding - now;
+  if (diff <= 0) {
+    document.getElementById('cd-days').textContent = '0';
+    document.getElementById('cd-hours').textContent = '0';
+    document.getElementById('cd-mins').textContent = '0';
+    document.getElementById('cd-secs').textContent = '0';
+    return;
+  }
+  const days  = Math.floor(diff / (1000 * 60 * 60 * 24));
+  const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+  const mins  = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+  const secs  = Math.floor((diff % (1000 * 60)) / 1000);
+  document.getElementById('cd-days').textContent  = days;
+  document.getElementById('cd-hours').textContent = String(hours).padStart(2,'0');
+  document.getElementById('cd-mins').textContent  = String(mins).padStart(2,'0');
+  document.getElementById('cd-secs').textContent  = String(secs).padStart(2,'0');
+}
+updateCountdown();
+setInterval(updateCountdown, 1000);
+
+// ── MUSIC ──
+const audio = document.getElementById('bg-music');
+const btn   = document.getElementById('music-btn');
+let playing = false;
+
+function toggleMusic() {
+  if (playing) {
+    audio.pause();
+    btn.textContent = '🎵';
+    btn.classList.remove('playing');
+  } else {
+    audio.play().catch(() => {});
+    btn.textContent = '⏸';
+    btn.classList.add('playing');
+  }
+  playing = !playing;
+}
+
+// Auto-play on first interaction
+document.addEventListener('click', function tryAutoPlay() {
+  if (!playing) {
+    audio.play().then(() => {
+      playing = true;
+      btn.textContent = '⏸';
+      btn.classList.add('playing');
+    }).catch(() => {});
+  }
+  document.removeEventListener('click', tryAutoPlay);
+}, { once: true });
+
+// ── RSVP ──
+function submitRSVP(e) {
+  e.preventDefault();
+  const name = document.getElementById('rsvp-name').value;
+  document.getElementById('rsvp-success').style.display = 'block';
+  document.getElementById('rsvp-success').innerHTML =
+    `Thank you, <em>${name}</em>! Your RSVP has been received 💜<br>
+     <small style="font-family:'Jost',sans-serif;font-size:0.8rem;color:var(--text-mid);">We can't wait to celebrate with you on September 11th!</small>`;
+  e.target.reset();
+  e.target.style.display = 'none';
+}
+</script>
+</body>
+</html>
